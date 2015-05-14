@@ -84,8 +84,8 @@ function GameCntl($scope, $timeout) {
         $scope.right_indicator = false;
         $scope.wrong_indicator = false;
         
-        var speaktext = $scope.fact.questions[$scope.question].q.replace(/_/g, "");
-        speak(speaktext);
+        //var speaktext = $scope.fact.questions[$scope.question].q.replace(/_/g, "");
+        //speak(speaktext);
     };
     
     $scope.keyup = function(e) {
