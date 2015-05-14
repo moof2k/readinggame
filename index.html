@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Word Game</title>
+    <title>Reading Game</title>
     
     <!-- Bootstrap -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -20,6 +20,7 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/angular.min.js"></script>
     <script src="js/jquery.jplayer.min.js"></script>
+    <script src="facts.js"></script>
     <script src="game.js"></script>
     
     <style>
@@ -39,18 +40,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">wordgame</a>
+                <a class="navbar-brand" href="#">readinggame</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">mode <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a ng-href="#" ng-click="setmode('any')">any letter</a></li>
-                            <li><a ng-href="#" ng-click="setmode('first')">first letter only</a></li>
-                        </ul>
-                    </li>
-                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a>{{number_right}} correct</a></li>
                 </ul>
@@ -59,14 +51,14 @@
         </div>
     </nav>
     
-    <div>
-        <center>
+    <div class="container">
+            <div><img src="{{fact.image}}"></div>
             <div>
-                <img src="img/{{word}}.jpg">
-            </div>
-            
-            <div>
-                <h1 style="font-size: 72px;">{{clue}} </h1>
+                <h1 style="font-size: 36px;">{{fact.fact}}</h1>
+                <h1>{{question.q}}</h1>
+                <ol style="font-size: 24px;">
+                    <li ng-repeat="a in question.a">{{a[0]}}</li>
+                </ol>
             </div>
             <div ng-hide="!right_indicator">
                 <h1 style="font-size: 72px; color: #468847">✔</h1>
@@ -74,7 +66,6 @@
             <div ng-hide="!wrong_indicator">
                 <h1 style="font-size: 72px; color: #ff0000">X</h1>
             </div>
-        </center>
     </div>
     
     

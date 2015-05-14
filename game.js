@@ -1,95 +1,3 @@
-// ls | perl -pi -e 's/^(.*)\.jpg/"$1",/g'
-
-words = [
-         "acorn",
-         "apple",
-         "backpack",
-         "ball",
-         "barn",
-         "basket",
-         "basketball",
-         "bear",
-         "bed",
-         "bee",
-         "black",
-         "blue",
-         "boat",
-         "book",
-         "brown",
-         "bus",
-         "cake",
-         "california",
-         "camera",
-         "candy",
-         "car",
-         "cat",
-         "chair",
-         "cloud",
-         "cow",
-         "dog",
-         "doll",
-         "donkey",
-         "duck",
-         "elephant",
-         "extinguisher",
-         "fire",
-         "firefighter",
-         "fish",
-         "four",
-         "fox",
-         "giraffe",
-         "globe",
-         "goat",
-         "green",
-         "hat",
-         "horse",
-         "hose",
-         "house",
-         "hydrant",
-         "ladder",
-         "leaf",
-         "leaves",
-         "markers",
-         "monkey",
-         "moose",
-         "one",
-         "orange",
-         "orchard",
-         "oregon",
-         "panda",
-         "people",
-         "pie",
-         "pig",
-         "pink",
-         "plane",
-         "pumpkin",
-         "purple",
-         "rain",
-         "rake",
-         "red",
-         "road",
-         "rollercoaster",
-         "room",
-         "ruler",
-         "saw",
-         "scarecrow",
-         "school",
-         "seed",
-         "shell",
-         "snow",
-         "soccerball",
-         "stars",
-         "sun",
-         "taxi",
-         "teacher",
-         "three",
-         "train",
-         "tree",
-         "truck",
-         "two",
-         "white",
-         "yellow"
-];
 
 function speak(str) {
     
@@ -99,38 +7,59 @@ function speak(str) {
     window.speechSynthesis.speak(msg);
 }
 
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex ;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
 
 function GameCntl($scope, $timeout) {
-    $scope.clue = "_ar";
-    $scope.word = "car";
-    $scope.letter = "c";
-    $scope.index = 0;
+    $scope.fact = 0;
+    $scope.question = "";
+    $scope.answer = 0;
+    
     $scope.right_indicator = false;
     $scope.wrong_indicator = false;
     $scope.number_right = 0;
     $scope.timeout = 0;
-    $scope.mode = "any";
     
     $scope.setmode = function(m) {
-        $scope.mode = m;
         $scope.next();
-    }
+    };
     
     $scope.next = function() {
         
         $scope.timeout = 0;
         
-        // Pick a random word
-        $scope.word = words[Math.floor(Math.random()*words.length)];
-        
-        // Select a letter
-        if($scope.mode == "any") {
-            $scope.index = Math.floor(Math.random()*$scope.word.length);
-        } else {
-            $scope.index = 0;
+        // Pick a random fact
+        $scope.fact = facts[Math.floor(Math.random() * facts.length)];
+
+        // Pick a random question
+        $scope.question = $scope.fact.questions[Math.floor(Math.random() * $scope.fact.questions.length)];
+
+        // Randomize the order of the answers
+        $scope.question.a = shuffle($scope.question.a);
+
+        // Determine the answer (1-indexed)
+        var i = 0;
+        for (i = 0; i < $scope.question.a.length; i++) {
+            if ($scope.question.a[i][1] == 1) {
+                $scope.answer = i + 1;
+            }
         }
-        
-        $scope.letter = $scope.word[$scope.index];
         
         $scope.resetclue();
     };
@@ -140,10 +69,6 @@ function GameCntl($scope, $timeout) {
         $scope.right_indicator = false;
         $scope.wrong_indicator = false;
         
-        $scope.clue = $scope.word.substr(0, $scope.index) + '_'
-        + $scope.word.substr($scope.index + 1);
-        
-        speak($scope.word);
     };
     
     $scope.keyup = function(e) {
@@ -153,16 +78,20 @@ function GameCntl($scope, $timeout) {
         }
         
         c = String.fromCharCode(e.keyCode);
-        
-        // Ignore key presses outside of A-Z
-        if(c < 'A' || c > 'Z') {
-            return;
+
+        if(c == ' ') {
+            $scope.next();
         }
         
-        if(c == $scope.letter.toUpperCase()) {
+        // Ignore key presses outside of 0-9
+        if(c < '0' || c > '9') {
+            return;
+        }
+
+        c = parseInt(c);
+        
+        if(c == $scope.answer) {
             $scope.correct();
-        } else if(c == ' ') {
-            $scope.next();
         } else {
             $scope.incorrect(c);
         }
@@ -175,10 +104,7 @@ function GameCntl($scope, $timeout) {
         $scope.right_indicator = true;
         $scope.wrong_indicator = false;
         
-        $scope.clue = $scope.word.substr(0, $scope.index) + $scope.letter
-        + $scope.word.substr($scope.index + 1);
-        
-        if($scope.timeout != 0) {
+        if($scope.timeout !== 0) {
             $timeout.cancel($scope.timeout);
         }
         $scope.timeout = $timeout($scope.next, 2000);
@@ -190,15 +116,11 @@ function GameCntl($scope, $timeout) {
         $scope.right_indicator = false;
         $scope.wrong_indicator = true;
         
-        $scope.clue = $scope.word.substr(0, $scope.index) + c.toLowerCase()
-        + $scope.word.substr($scope.index + 1);
-        
-        if($scope.timeout != 0) {
+        if($scope.timeout !== 0) {
             $timeout.cancel($scope.timeout);
         }
         $scope.timeout = $timeout($scope.resetclue, 2000);
         
-        speak($scope.clue + "?");
     };
     
     $scope.next();
