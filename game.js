@@ -26,6 +26,40 @@ function shuffle(array) {
   return array;
 }
 
+function speakOnClick() {
+    c = document.caretRangeFromPoint(event.pageX, event.pageY);
+    
+    var text = c.startContainer.data;
+    var startOffset = c.startOffset;
+    var endOffset = startOffset;
+
+    do {
+        if (text[startOffset] == ' ') {
+            break;
+        }
+        if (startOffset === 0) {
+            break;
+        }
+
+        startOffset--;
+    } while(1);
+
+    do {
+        if (text[endOffset] == ' ') {
+            break;
+        }
+        if (endOffset >= text.length) {
+            break;
+        }
+
+        endOffset++;
+    } while(1);
+
+    text = text.substr(startOffset, endOffset - startOffset);
+    console.log(text);
+    speak(text);
+}
+
 function GameCntl($scope, $timeout) {
 
     $scope.fact = {};
