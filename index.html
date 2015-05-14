@@ -52,20 +52,30 @@
     </nav>
     
     <div class="container">
-            <div><img src="{{fact.image}}"></div>
-            <div>
+        <div class="row">
+            <div class="col-md-8">
                 <h1 style="font-size: 36px;">{{fact.fact}}</h1>
-                <h1>{{question.q}}</h1>
+            </div>
+            <div class="col-md-4">
+                <img src="{{fact.image}}">
+            </div>
+        </div>
+        <div class="row">    
+            <div class="col-md-8">
+                <h1>{{fact.questions[question].q}}</h1>
                 <ol style="font-size: 24px;">
-                    <li ng-repeat="a in question.a">{{a[0]}}</li>
+                    <li ng-repeat="a in fact.questions[question].a">{{a[0]}}</li>
                 </ol>
             </div>
-            <div ng-hide="!right_indicator">
-                <h1 style="font-size: 72px; color: #468847">✔</h1>
+            <div class="col-md-4">
+                <div ng-hide="!right_indicator">
+                    <h1 style="font-size: 72px; color: #468847">✔</h1>
+                </div>
+                <div ng-hide="!wrong_indicator">
+                    <h1 style="font-size: 72px; color: #ff0000">X</h1>
+                </div>
             </div>
-            <div ng-hide="!wrong_indicator">
-                <h1 style="font-size: 72px; color: #ff0000">X</h1>
-            </div>
+        </div>
     </div>
     
     
@@ -73,13 +83,19 @@
     <script src="js/bootstrap.min.js"></script>
     
     <br><br><br><br>
-    <div id="jpId"></div>
+    <div id="jpId_correct"></div>
+    <div id="jpId_incorrect"></div>
     
     <script>
     $(document).ready(function() {
-        $("#jpId").jPlayer( {
+        $("#jpId_correct").jPlayer( {
             ready: function () {
                 $(this).jPlayer("setMedia", {mp3: "correct.mp3"});
+            }
+        });
+        $("#jpId_incorrect").jPlayer( {
+            ready: function () {
+                $(this).jPlayer("setMedia", {mp3: "incorrect.mp3"});
             }
         });
     });

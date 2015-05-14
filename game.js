@@ -27,8 +27,9 @@ function shuffle(array) {
 }
 
 function GameCntl($scope, $timeout) {
-    $scope.fact = 0;
-    $scope.question = "";
+
+    $scope.fact = {};
+    $scope.question = 0;
     $scope.answer = 0;
     
     $scope.right_indicator = false;
@@ -39,29 +40,43 @@ function GameCntl($scope, $timeout) {
     $scope.setmode = function(m) {
         $scope.next();
     };
-    
-    $scope.next = function() {
-        
-        $scope.timeout = 0;
-        
-        // Pick a random fact
+
+    $scope.nextFact = function() {
+        // Select a random fact
         $scope.fact = facts[Math.floor(Math.random() * facts.length)];
 
-        // Pick a random question
-        $scope.question = $scope.fact.questions[Math.floor(Math.random() * $scope.fact.questions.length)];
+        // Randomize the order of questions for this fact
+        $scope.fact.questions = shuffle($scope.fact.questions);
 
-        // Randomize the order of the answers
-        $scope.question.a = shuffle($scope.question.a);
+        // Initialize to the first question
+        $scope.question = -1;
 
-        // Determine the answer (1-indexed)
-        var i = 0;
-        for (i = 0; i < $scope.question.a.length; i++) {
-            if ($scope.question.a[i][1] == 1) {
-                $scope.answer = i + 1;
-            }
-        }
+        $scope.nextQuestion();
+    };
+    
+    $scope.nextQuestion = function() {
         
-        $scope.resetclue();
+        $scope.timeout = 0;
+
+        // Pick the next question
+        $scope.question = $scope.question + 1;
+
+        if ($scope.question < $scope.fact.questions.length) {
+            // Randomize the order of the answers
+            $scope.fact.questions[$scope.question].a = shuffle($scope.fact.questions[$scope.question].a);
+
+            // Determine the answer (1-indexed)
+            var i = 0;
+            for (i = 0; i < $scope.fact.questions[$scope.question].a.length; i++) {
+                if ($scope.fact.questions[$scope.question].a[i][1] == 1) {
+                    $scope.answer = i + 1;
+                }
+            }
+            
+            $scope.resetclue();
+        } else {
+            $scope.nextFact();
+        }
     };
     
     $scope.resetclue = function() {
@@ -69,6 +84,8 @@ function GameCntl($scope, $timeout) {
         $scope.right_indicator = false;
         $scope.wrong_indicator = false;
         
+        var speaktext = $scope.fact.questions[$scope.question].q.replace(/_/g, "");
+        speak(speaktext);
     };
     
     $scope.keyup = function(e) {
@@ -107,9 +124,9 @@ function GameCntl($scope, $timeout) {
         if($scope.timeout !== 0) {
             $timeout.cancel($scope.timeout);
         }
-        $scope.timeout = $timeout($scope.next, 2000);
+        $scope.timeout = $timeout($scope.nextQuestion, 2000);
         
-        $('#jpId').jPlayer("play");
+        $('#jpId_correct').jPlayer("play");
     };
     
     $scope.incorrect = function(c) {
@@ -119,9 +136,10 @@ function GameCntl($scope, $timeout) {
         if($scope.timeout !== 0) {
             $timeout.cancel($scope.timeout);
         }
-        $scope.timeout = $timeout($scope.resetclue, 2000);
-        
+        $scope.timeout = $timeout($scope.nextQuestion, 2000);
+      
+        $('#jpId_incorrect').jPlayer("play");  
     };
     
-    $scope.next();
+    $scope.nextFact();
 }
