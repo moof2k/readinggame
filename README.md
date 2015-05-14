@@ -1,9 +1,7 @@
-wordgame
+readinggame
 ========
 
-A spelling game I created for my kids.
+A simple reading comprehension game I created for my kids.
 
-The game shows you a picture along with the corresponding word with one letter missing. You press the
-key of the missing letter.
+The game shows you a block of text and a multiple-choice question about the block of text.
 
-http://moof2k.github.io/wordgame/
